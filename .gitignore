@@ -3,6 +3,7 @@
 venv/
 __pycache__/
 *.py[cod]
+new_venv/
 
 # IDE
 .idea/
