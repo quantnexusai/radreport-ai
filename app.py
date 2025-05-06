@@ -5,6 +5,8 @@ from utils.supabase_client import SupabaseClient
 import io
 from dotenv import load_dotenv
 import logging
+from supabase import create_client  # Make sure to import this
+import os  # Make sure to import this
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +15,34 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-# Initialize clients
+# Debug section - ADD THIS CODE HERE
+def test_supabase_connection():
+    try:
+        # Create test client
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        if not url or not key:
+            return "SUPABASE_URL or SUPABASE_KEY environment variables are missing"
+        
+        client = create_client(url, key)
+        
+        # Test facilities table
+        facilities_response = client.table("facilities").select("count", count="exact").execute()
+        facilities_count = facilities_response.count if hasattr(facilities_response, 'count') else 0
+        
+        # Test impression lookup table
+        patterns_response = client.table("impression_lookup").select("count", count="exact").execute()
+        patterns_count = patterns_response.count if hasattr(patterns_response, 'count') else 0
+        
+        # Test unmatched findings table
+        unmatched_response = client.table("unmatched_findings").select("count", count="exact").execute()
+        unmatched_count = unmatched_response.count if hasattr(unmatched_response, 'count') else 0
+        
+        return f"Connection successful. Facilities: {facilities_count}, Impression patterns: {patterns_count}, Unmatched findings: {unmatched_count}"
+    except Exception as e:
+        return f"Connection error: {str(e)}"
+
+# Initialize clients - EXISTING CODE STARTS AGAIN HERE
 try:
     supabase = SupabaseClient()
     report_generator = ReportGenerator()
@@ -160,6 +189,18 @@ st.markdown("<div style='text-align: center; color: #6c757d;'>RadReport AI v1.0 
 # Create additional pages (hidden in a menu in v1)
 menu = ["Report Generator", "Admin"]
 choice = st.sidebar.selectbox("Select Page", menu)
+
+# Debug mode in sidebar - ADD THIS CODE HERE
+with st.sidebar:
+    debug_expand = st.expander("Debug Tools")
+    with debug_expand:
+        if 'debug_mode' not in st.session_state:
+            st.session_state.debug_mode = False
+        st.session_state.debug_mode = st.checkbox("Enable Debug Mode", value=st.session_state.debug_mode)
+        if st.session_state.debug_mode:
+            if st.button("Test Supabase Connection"):
+                connection_status = test_supabase_connection()
+                st.code(connection_status)
 
 if choice == "Admin":
     st.sidebar.info("Admin features are password protected")
