@@ -30,7 +30,7 @@ class ClaudeClient:
         """
         
         response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-7-sonnet-latest",
             max_tokens=1000,
             temperature=0,
             system="You are a radiology report assistant that helps format findings into proper medical terminology and grammar. You never change measurements or clinical observations.",
@@ -65,7 +65,7 @@ class ClaudeClient:
         """
         
         response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-7-sonnet-latest",
             max_tokens=1000,
             temperature=0,
             system="You are a radiology AI assistant that helps identify potential findings in medical images. You are conservative in your assessments and careful not to overinterpret single images.",
@@ -105,7 +105,7 @@ class ClaudeClient:
         """
         
         response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-7-sonnet-latest",
             max_tokens=150,
             temperature=0,
             system="You are a radiology report assistant that generates appropriate impression text for findings. You follow standard radiological guidelines for follow-up recommendations.",
@@ -149,7 +149,7 @@ class ClaudeClient:
         """
         
         response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-7-sonnet-latest",
             max_tokens=500,
             temperature=0,
             system="You are a radiology report assistant that categorizes findings into appropriate sections. You match each finding to exactly one category from the provided list, using the exact category names given.",
