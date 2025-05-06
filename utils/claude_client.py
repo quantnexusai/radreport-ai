@@ -1,5 +1,7 @@
 import os
-import anthropic
+import requests
+import json
+import base64
 from dotenv import load_dotenv
 import logging
 
@@ -10,9 +12,29 @@ load_dotenv()
 class ClaudeClient:
     def __init__(self):
         self.api_key = os.environ.get("CLAUDE_API_KEY")
-        self.client = anthropic.Anthropic(api_key=self.api_key)
-        self.model = "claude-3-7-sonnet-20250219"  # Using your specified model
+        self.base_url = "https://api.anthropic.com/v1/messages"
+        self.model = "claude-3-7-sonnet-20250219"
         logger.info(f"Initialized Claude client with model: {self.model}")
+        
+    def _make_api_request(self, payload):
+        headers = {
+            "x-api-key": self.api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+        
+        response = requests.post(
+            self.base_url,
+            headers=headers,
+            json=payload
+        )
+        
+        if response.status_code != 200:
+            error_msg = f"API request failed with status code {response.status_code}: {response.text}"
+            logger.error(error_msg)
+            raise Exception(error_msg)
+        
+        return response.json()
         
     def process_findings(self, findings, section):
         """Process findings text with Claude to correct grammar and format"""
@@ -27,16 +49,17 @@ class ClaudeClient:
             be on its own line. Maintain all medical details exactly as provided.
             """
             
-            # Use the Messages API
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=1000,
-                temperature=0,
-                system="You are a radiology report assistant that helps format findings into proper medical terminology and grammar. You never change measurements or clinical observations.",
-                messages=[{"role": "user", "content": prompt}]
-            )
+            payload = {
+                "model": self.model,
+                "max_tokens": 1000,
+                "temperature": 0,
+                "system": "You are a radiology report assistant that helps format findings into proper medical terminology and grammar. You never change measurements or clinical observations.",
+                "messages": [{"role": "user", "content": prompt}]
+            }
             
-            return response.content[0].text
+            response = self._make_api_request(payload)
+            
+            return response["content"][0]["text"]
         except Exception as e:
             logger.error(f"Error processing findings: {e}")
             raise
@@ -58,24 +81,40 @@ class ClaudeClient:
             If no significant abnormalities are evident, state that clearly.
             """
             
-            # Use the Messages API with image content
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=1000,
-                temperature=0,
-                system="You are a radiology AI assistant that helps identify potential findings in medical images. You are conservative in your assessments and careful not to overinterpret single images.",
-                messages=[
-                    {"role": "user", "content": [
-                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": image_data}},
-                        {"type": "text", "text": prompt}
-                    ]}
+            # When using direct API, content needs to be in a specific format
+            payload = {
+                "model": self.model,
+                "max_tokens": 1000,
+                "temperature": 0,
+                "system": "You are a radiology AI assistant that helps identify potential findings in medical images. You are conservative in your assessments and careful not to overinterpret single images.",
+                "messages": [
+                    {
+                        "role": "user", 
+                        "content": [
+                            {
+                                "type": "image", 
+                                "source": {
+                                    "type": "base64", 
+                                    "media_type": "image/jpeg", 
+                                    "data": image_data
+                                }
+                            },
+                            {
+                                "type": "text", 
+                                "text": prompt
+                            }
+                        ]
+                    }
                 ]
-            )
+            }
             
-            return response.content[0].text
+            response = self._make_api_request(payload)
+            
+            return response["content"][0]["text"]
         except Exception as e:
             logger.error(f"Error analyzing image: {e}")
-            raise
+            # Provide a fallback
+            return "Image analysis failed. Please check API key permissions and connection."
     
     def generate_impression(self, finding, section_name):
         """Generate an appropriate impression for a finding using Claude"""
@@ -94,15 +133,17 @@ class ClaudeClient:
             Return only the impression text with no additional commentary.
             """
             
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=150,
-                temperature=0,
-                system="You are a radiology report assistant that generates appropriate impression text for findings. You follow standard radiological guidelines for follow-up recommendations.",
-                messages=[{"role": "user", "content": prompt}]
-            )
+            payload = {
+                "model": self.model,
+                "max_tokens": 150,
+                "temperature": 0,
+                "system": "You are a radiology report assistant that generates appropriate impression text for findings. You follow standard radiological guidelines for follow-up recommendations.",
+                "messages": [{"role": "user", "content": prompt}]
+            }
             
-            return response.content[0].text.strip()
+            response = self._make_api_request(payload)
+            
+            return response["content"][0]["text"].strip()
         except Exception as e:
             logger.error(f"Error generating impression: {e}")
             raise
@@ -132,19 +173,21 @@ class ClaudeClient:
             Provide this for each finding, with one blank line between entries.
             """
             
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=500,
-                temperature=0,
-                system="You are a radiology report assistant that categorizes findings into appropriate sections. You match each finding to exactly one category from the provided list, using the exact category names given.",
-                messages=[{"role": "user", "content": prompt}]
-            )
+            payload = {
+                "model": self.model,
+                "max_tokens": 500,
+                "temperature": 0,
+                "system": "You are a radiology report assistant that categorizes findings into appropriate sections. You match each finding to exactly one category from the provided list, using the exact category names given.",
+                "messages": [{"role": "user", "content": prompt}]
+            }
+            
+            response = self._make_api_request(payload)
             
             # Parse Claude's response to extract finding-to-category mappings
             result = {}
             current_finding = None
             
-            for line in response.content[0].text.strip().split('\n'):
+            for line in response["content"][0]["text"].strip().split('\n'):
                 line = line.strip()
                 if line.startswith('Finding:'):
                     current_finding = line[len('Finding:'):].strip()
