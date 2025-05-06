@@ -27,15 +27,16 @@ class ClaudeClient:
             be on its own line. Maintain all medical details exactly as provided.
             """
             
-            # Use the Anthropic 0.50.0 API structure
-            response = self.client.completions.create(
+            # Use the Messages API
+            response = self.client.messages.create(
                 model=self.model,
-                max_tokens_to_sample=1000,
+                max_tokens=1000,
                 temperature=0,
-                prompt=f"{anthropic.HUMAN_PROMPT} {prompt} {anthropic.AI_PROMPT}"
+                system="You are a radiology report assistant that helps format findings into proper medical terminology and grammar. You never change measurements or clinical observations.",
+                messages=[{"role": "user", "content": prompt}]
             )
             
-            return response.completion
+            return response.content[0].text
         except Exception as e:
             logger.error(f"Error processing findings: {e}")
             raise
@@ -43,10 +44,8 @@ class ClaudeClient:
     def analyze_image(self, image_data, study_type):
         """Process radiology image with Claude vision capabilities"""
         try:
-            # Since Anthropic 0.50.0 might not support image input directly,
-            # use a more compatible approach
             prompt = f"""
-            Please analyze this {study_type} CT scan image that I've just uploaded and provide any notable observations 
+            Please analyze this {study_type} CT scan image and provide any notable observations 
             that might complement the radiologist's findings. Focus only on obvious abnormalities
             visible in this single image. Be conservative and specific in your assessment.
             
@@ -57,21 +56,26 @@ class ClaudeClient:
             4. Significance (normal variant, potentially concerning, etc.)
             
             If no significant abnormalities are evident, state that clearly.
-            
-            Note: Due to limitations with the current API version, I'm providing a textual analysis of what I see in the image.
             """
             
-            response = self.client.completions.create(
+            # Use the Messages API with image content
+            response = self.client.messages.create(
                 model=self.model,
-                max_tokens_to_sample=1000,
+                max_tokens=1000,
                 temperature=0,
-                prompt=f"{anthropic.HUMAN_PROMPT} {prompt} {anthropic.AI_PROMPT}"
+                system="You are a radiology AI assistant that helps identify potential findings in medical images. You are conservative in your assessments and careful not to overinterpret single images.",
+                messages=[
+                    {"role": "user", "content": [
+                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": image_data}},
+                        {"type": "text", "text": prompt}
+                    ]}
+                ]
             )
             
-            return response.completion
+            return response.content[0].text
         except Exception as e:
             logger.error(f"Error analyzing image: {e}")
-            return "Image analysis is not supported with the current API version. Please upgrade to Anthropic SDK version 0.8.0 or higher for image analysis support."
+            raise
     
     def generate_impression(self, finding, section_name):
         """Generate an appropriate impression for a finding using Claude"""
@@ -90,14 +94,15 @@ class ClaudeClient:
             Return only the impression text with no additional commentary.
             """
             
-            response = self.client.completions.create(
+            response = self.client.messages.create(
                 model=self.model,
-                max_tokens_to_sample=150,
+                max_tokens=150,
                 temperature=0,
-                prompt=f"{anthropic.HUMAN_PROMPT} {prompt} {anthropic.AI_PROMPT}"
+                system="You are a radiology report assistant that generates appropriate impression text for findings. You follow standard radiological guidelines for follow-up recommendations.",
+                messages=[{"role": "user", "content": prompt}]
             )
             
-            return response.completion.strip()
+            return response.content[0].text.strip()
         except Exception as e:
             logger.error(f"Error generating impression: {e}")
             raise
@@ -127,18 +132,19 @@ class ClaudeClient:
             Provide this for each finding, with one blank line between entries.
             """
             
-            response = self.client.completions.create(
+            response = self.client.messages.create(
                 model=self.model,
-                max_tokens_to_sample=500,
+                max_tokens=500,
                 temperature=0,
-                prompt=f"{anthropic.HUMAN_PROMPT} {prompt} {anthropic.AI_PROMPT}"
+                system="You are a radiology report assistant that categorizes findings into appropriate sections. You match each finding to exactly one category from the provided list, using the exact category names given.",
+                messages=[{"role": "user", "content": prompt}]
             )
             
             # Parse Claude's response to extract finding-to-category mappings
             result = {}
             current_finding = None
             
-            for line in response.completion.strip().split('\n'):
+            for line in response.content[0].text.strip().split('\n'):
                 line = line.strip()
                 if line.startswith('Finding:'):
                     current_finding = line[len('Finding:'):].strip()
