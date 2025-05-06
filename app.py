@@ -200,7 +200,7 @@ with st.sidebar:
         if st.session_state.debug_mode:
             if st.button("Test Supabase Connection"):
                 connection_status = test_supabase_connection()
-                st.code(connection_status)
+                st.code(connection_status) 
 
 if choice == "Admin":
     st.sidebar.info("Admin features are password protected")
