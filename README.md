@@ -30,7 +30,7 @@ RadReport AI is a sophisticated web application that automatically generates str
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/quantnexus.ai/radreport-ai.git
+   git clone https://github.com/quantnexusai/radreport-ai.git
    cd radreport-ai
    ```
 
