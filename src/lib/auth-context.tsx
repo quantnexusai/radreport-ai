@@ -1,7 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { getSupabaseClient } from './supabase';
 import { Profile, AuthState } from './types';
 import { isDemoMode, DEMO_USER, DEMO_PROFILE } from './demo-data';
@@ -20,6 +19,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDemo, setIsDemo] = useState(false);
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      setProfile(data as Profile);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  }, []);
 
   useEffect(() => {
     // Check for demo mode
@@ -74,29 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
-
-  const fetchProfile = async (userId: string) => {
-    if (isDemo) return;
-
-    try {
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return;
-      }
-
-      setProfile(data as Profile);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
+  }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
     if (isDemo) {

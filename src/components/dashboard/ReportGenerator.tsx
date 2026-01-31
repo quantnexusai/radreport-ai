@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RotateCcw, CheckCircle, Download, Upload, Image as ImageIcon } from 'lucide-react';
+import { RotateCcw, CheckCircle, Download, Upload } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { isDemoMode, generateDemoReport, DEMO_FACILITIES } from '@/lib/demo-data';
 import { Facility, StudyType, SectionsData } from '@/lib/types';
@@ -18,7 +18,7 @@ const STUDY_TYPES: { value: StudyType; label: string }[] = [
 ];
 
 export function ReportGenerator() {
-  const { isDemo } = useAuth();
+  useAuth();
 
   // Form state
   const [studyType, setStudyType] = useState<StudyType>('Full Body');
@@ -115,11 +115,6 @@ export function ReportGenerator() {
       chest: chestFindings,
       abdomen_pelvis: abdomenFindings,
     };
-
-    // Check if at least one section has findings
-    const hasFindings =
-      (studyType !== 'Abdomen and Pelvis' && chestFindings.trim()) ||
-      (studyType !== 'Chest' && abdomenFindings.trim());
 
     setIsGenerating(true);
     setError('');
@@ -258,6 +253,7 @@ export function ReportGenerator() {
               </label>
               {imagePreview && (
                 <div className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imagePreview}
                     alt="Preview"

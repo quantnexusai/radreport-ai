@@ -47,7 +47,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           setMessage('Check your email for a confirmation link!');
         }
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);

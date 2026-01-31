@@ -10,7 +10,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoading, user, isDemo } = useAuth();
+  const { isLoading } = useAuth();
 
   // Show loader while checking auth
   if (isLoading) {

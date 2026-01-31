@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { ShieldAlert } from 'lucide-react';
 
 export default function AdminPage() {
-  const { isAdmin, isDemo, isLoading } = useAuth();
+  const { isAdmin, isDemo } = useAuth();
 
   // In demo mode, allow admin access
   if (!isAdmin && !isDemo) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { generateReport } from '@/lib/report-generator';
-import { isDemoMode, generateDemoReport, DEMO_FACILITIES, DEMO_TEMPLATES, DEMO_PATTERNS } from '@/lib/demo-data';
+import { isDemoMode, generateDemoReport } from '@/lib/demo-data';
 import { ReportGenerationRequest, Facility, ReportTemplate, ImpressionPattern } from '@/lib/types';
 
 export async function POST(request: NextRequest) {

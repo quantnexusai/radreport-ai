@@ -126,7 +126,7 @@ interface FacilitiesTabProps {
   isDemo: boolean;
 }
 
-function FacilitiesTab({ facilities, setFacilities, isDemo }: FacilitiesTabProps) {
+function FacilitiesTab({ facilities, setFacilities }: FacilitiesTabProps) {
   const [name, setName] = useState('');
   const [chestTemplate, setChestTemplate] = useState('');
   const [abdomenTemplate, setAbdomenTemplate] = useState('');
@@ -181,7 +181,7 @@ function FacilitiesTab({ facilities, setFacilities, isDemo }: FacilitiesTabProps
       if (!response.ok) throw new Error('Failed to delete facility');
 
       setFacilities(facilities.filter((f) => f.id !== id));
-    } catch (err) {
+    } catch {
       setError('Failed to delete facility');
     }
   };
@@ -309,7 +309,7 @@ interface TemplatesTabProps {
   isDemo: boolean;
 }
 
-function TemplatesTab({ facilities, isDemo }: TemplatesTabProps) {
+function TemplatesTab({ facilities }: TemplatesTabProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
     facilities[0] || null
   );
@@ -347,7 +347,7 @@ function TemplatesTab({ facilities, isDemo }: TemplatesTabProps) {
       if (!response.ok) throw new Error('Failed to update templates');
 
       setMessage('Templates updated successfully!');
-    } catch (err) {
+    } catch {
       setMessage('Failed to update templates');
     } finally {
       setIsSubmitting(false);
@@ -413,7 +413,7 @@ interface PatternsTabProps {
   isDemo: boolean;
 }
 
-function PatternsTab({ patterns, setPatterns, isDemo }: PatternsTabProps) {
+function PatternsTab({ patterns, setPatterns }: PatternsTabProps) {
   const [findingPattern, setFindingPattern] = useState('');
   const [sectionName, setSectionName] = useState<SectionName>('chest');
   const [impressionText, setImpressionText] = useState('');
@@ -446,7 +446,7 @@ function PatternsTab({ patterns, setPatterns, isDemo }: PatternsTabProps) {
       setPatterns([...patterns, newPattern]);
       setFindingPattern('');
       setImpressionText('');
-    } catch (err) {
+    } catch {
       setError('Failed to add pattern');
     } finally {
       setIsSubmitting(false);
@@ -464,7 +464,7 @@ function PatternsTab({ patterns, setPatterns, isDemo }: PatternsTabProps) {
       if (!response.ok) throw new Error('Failed to delete pattern');
 
       setPatterns(patterns.filter((p) => p.id !== id));
-    } catch (err) {
+    } catch {
       setError('Failed to delete pattern');
     }
   };
@@ -554,7 +554,7 @@ interface UnmatchedTabProps {
   isDemo: boolean;
 }
 
-function UnmatchedTab({ findings, setFindings, isDemo }: UnmatchedTabProps) {
+function UnmatchedTab({ findings, setFindings }: UnmatchedTabProps) {
   const handleDelete = async (id: number) => {
     try {
       const response = await fetch(`/api/unmatched-findings/${id}`, {
