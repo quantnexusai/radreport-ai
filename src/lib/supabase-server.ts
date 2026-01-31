@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 export async function createServerSupabaseClient() {
@@ -39,8 +40,6 @@ export function createAdminSupabaseClient() {
     throw new Error('Missing Supabase admin environment variables');
   }
 
-  // Import directly for admin operations
-  const { createClient } = require('@supabase/supabase-js');
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
