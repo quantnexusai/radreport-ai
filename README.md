@@ -1,110 +1,145 @@
 # RadReport AI
 
-## AI-Powered Multimodal Radiology Report Generator
+AI-Powered Multimodal Radiology Report Generator. Deploy in minutes with Vercel.
 
-RadReport AI is a sophisticated web application that automatically generates structured radiology reports from radiologist findings and uploaded images. It combines AI language processing with standardized templates to produce consistent, high-quality reports while saving valuable time for radiologists.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fquantnexusai%2Fradreport-ai&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY,ANTHROPIC_API_KEY&envDescription=Get%20keys%20from%20Supabase%20and%20Anthropic&project-name=radreport-ai&repository-name=radreport-ai)
 
-## 🌟 Key Features
+## Features
 
-- **Study Type Selection**: Support for Chest, Abdomen and Pelvis, or Full Body CT scans
-- **Facility-Specific Templates**: Customized technique sections based on facility equipment
-- **AI-Enhanced Processing**: Claude AI integration for natural language processing and image analysis
-- **Structured Report Generation**: Produces formatted reports with appropriate findings and impressions
-- **Image Upload & Analysis**: Optional image upload for AI-assisted analysis
-- **Intelligent Pattern Matching**: Maps findings to appropriate impressions using pattern database
-- **Continuous Improvement**: Logs unmatched findings for ongoing system enhancement
+- **Structured Reports** - Generate comprehensive radiology reports with proper formatting
+- **AI-Powered Analysis** - Claude AI integration for intelligent finding categorization
+- **Image Analysis** - Upload CT scan images for AI-assisted visual analysis
+- **Pattern Matching** - 3-tier intelligent pattern matching for consistent impressions
+- **Facility Templates** - Customized technique sections based on facility equipment
+- **Admin Panel** - Manage facilities, templates, and impression patterns
 
-## 📋 Screenshots
+## Quick Start
 
-![App Interface](assets/app_screen.png)
+### Step 1: Get Your API Keys
 
-## 🚀 Getting Started
+Before deploying, you'll need:
+
+1. **Supabase** - Create a project at [supabase.com](https://supabase.com)
+   - Get your Project URL and API keys from Settings > API
+2. **Anthropic** - Get an API key at [console.anthropic.com](https://console.anthropic.com)
+
+### Step 2: Deploy to Vercel
+
+Click the deploy button above and enter your API keys when prompted.
+
+### Step 3: Set Up Database
+
+Run the SQL in `supabase/schema.sql` in your Supabase SQL Editor to create the required tables.
+
+### Step 4: Done!
+
+Your RadReport AI instance is now fully functional.
+
+## Local Development
 
 ### Prerequisites
 
-- Python 3.8+
-- Supabase account
-- Anthropic Claude API key
+- Node.js 18+
+- npm or yarn
 
 ### Installation
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/quantnexusai/radreport-ai.git
-   cd radreport-ai
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/quantnexusai/radreport-ai.git
+cd radreport-ai
 
-2. Create and activate virtual environment
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+# Install dependencies
+npm install
 
-3. Install dependencies
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Copy environment template
+cp .env.example .env.local
 
-4. Create a `.env` file with your API keys
-   ```
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_KEY=your_supabase_key
-   CLAUDE_API_KEY=your_claude_api_key
-   ```
+# Add your API keys to .env.local
 
-5. Run the application
-   ```bash
-   streamlit run app.py
-   ```
+# Start development server
+npm run dev
+```
 
-## 💻 Usage
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-1. **Select Study Type**: Choose between Full Body, Chest, or Abdomen and Pelvis
-2. **Choose Facility**: Select the imaging facility where the scan was performed
-3. **Enter Findings**: Input the radiologist's findings in the relevant sections
-4. **Upload Image (Optional)**: Add a CT scan image for additional AI analysis
-5. **Generate Report**: Click the generate button to create a structured report
-6. **Review & Download**: Review the generated report and download as needed
+### Demo Mode
 
-## 🔧 Administrator Functions
+For local UI development without API keys, the app includes sample data:
 
-The system includes an admin panel (password protected) with the following capabilities:
+- Set `NEXT_PUBLIC_DEMO_MODE=true` in your `.env.local`
+- Sample facilities, templates, and patterns are displayed
+- Simulated Claude AI responses
+- Full UI preview without external services
 
-- **Template Management**: Modify facility-specific technique sections
-- **Impression Pattern Database**: Add and edit pattern-to-impression mappings
-- **Unmatched Findings**: Review findings that didn't match existing patterns and add new patterns based on them
+**Note:** Demo mode is for development only. Deployment requires valid API keys.
 
-## 🧠 How It Works
+## Usage
 
-1. **Input Processing**: The system processes the selected study type, facility, and entered findings
-2. **Template Selection**: Appropriate templates are retrieved based on study type and facility
-3. **Finding Processing**: Claude AI corrects grammar and formats findings
-4. **Category Matching**: Each finding is matched to the appropriate category in the template
-5. **Impression Generation**: The system matches findings to appropriate impressions using pattern matching
-6. **Image Analysis (Optional)**: If an image is provided, Claude analyzes it for additional findings
-7. **Report Assembly**: All components are combined into a complete, structured report
+1. **Select Study Type** - Choose Full Body, Chest, or Abdomen and Pelvis
+2. **Choose Facility** - Select the imaging facility
+3. **Enter Findings** - Input radiologist findings in the relevant sections
+4. **Upload Image (Optional)** - Add a CT scan for AI analysis
+5. **Generate Report** - Click generate to create a structured report
+6. **Download** - Review and download the report as needed
 
-## 📊 Future Enhancements (Version 2)
+## Admin Panel
 
-- DICOM image processing
-- Integration with hospital PACS/RIS systems
-- Enhanced AI analysis
-- Customizable report templates
-- Historical report comparison
-- Advanced analytics dashboard
+The admin panel (accessible to admin users) provides:
 
-## 🛠️ Technology Stack
+- **Facilities Management** - Add/edit imaging facilities and technique templates
+- **Impression Patterns** - Manage finding-to-impression mappings
+- **Unmatched Findings** - Review findings that didn't match patterns
 
-- **Frontend**: Streamlit
-- **Database**: Supabase
-- **AI Processing**: Anthropic Claude API
-- **Deployment**: Streamlit Cloud
-- **Version Control**: Git/GitHub
+## Environment Variables
 
-## 📄 License
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side) |
+| `ANTHROPIC_API_KEY` | Anthropic Claude API key |
+| `NEXT_PUBLIC_DEMO_MODE` | Set to `true` for demo mode |
 
-This project is proprietary and confidential. All rights reserved.
+## Tech Stack
 
-## 👤 Contact
+- **Framework** - Next.js 15 (App Router)
+- **Styling** - Tailwind CSS
+- **Database** - Supabase (PostgreSQL)
+- **AI** - Claude API (Anthropic)
+- **Hosting** - Vercel
+- **Icons** - Lucide React
 
-For questions or support, please contact ari@quantnexus.ai.
+## Project Structure
+
+```
+radreport-ai/
+├── src/
+│   ├── app/              # Next.js App Router pages
+│   │   ├── api/          # API routes
+│   │   ├── dashboard/    # Dashboard pages
+│   │   └── profile/      # Profile page
+│   ├── components/       # React components
+│   │   ├── ui/           # Reusable UI components
+│   │   └── dashboard/    # Dashboard-specific components
+│   └── lib/              # Utilities and configurations
+│       ├── supabase.ts   # Supabase client
+│       ├── claude.ts     # Claude API utilities
+│       └── types.ts      # TypeScript types
+├── supabase/
+│   └── schema.sql        # Database schema
+├── public/               # Static assets
+└── package.json
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local development guidelines.
+
+## Need Help?
+
+For assistance with deployment, configuration, or customization, contact us at **ari@quantnexus.ai**
+
+## License
+
+MIT License - use freely for personal or commercial projects.

@@ -1,55 +1,171 @@
 # Contributing to RadReport AI
 
-Thank you for your interest in contributing to RadReport AI! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to RadReport AI! This document provides guidelines and instructions for local development.
 
-## Getting Started
+## Development Setup
 
-1. Fork the repository
-2. Clone your fork locally
-3. Create a virtual environment and install dependencies:
+### Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- npm or yarn
+- Git
+
+### Getting Started
+
+1. **Fork and clone the repository**
+
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+   git clone https://github.com/YOUR_USERNAME/radreport-ai.git
+   cd radreport-ai
    ```
-4. Copy `.env.example` to `.env` and configure your environment variables
 
-## Development Process
+2. **Install dependencies**
 
-1. Create a new branch for your feature or fix:
    ```bash
-   git checkout -b feature/your-feature-name
+   npm install
    ```
-2. Make your changes
-3. Run tests to ensure nothing is broken:
+
+3. **Set up environment variables**
+
    ```bash
-   pytest
+   cp .env.example .env.local
    ```
-4. Commit your changes with a descriptive message
-5. Push to your fork and submit a pull request
+
+   For full functionality, add your API keys:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `ANTHROPIC_API_KEY`
+
+   For UI development without API keys, set:
+   ```
+   NEXT_PUBLIC_DEMO_MODE=true
+   ```
+
+4. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Open [http://localhost:3000](http://localhost:3000)**
+
+## Development Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run tests |
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   ├── claude/        # Claude AI endpoints
+│   │   ├── facilities/    # Facilities CRUD
+│   │   ├── impression-patterns/
+│   │   ├── reports/       # Report generation
+│   │   └── unmatched-findings/
+│   ├── dashboard/         # Dashboard pages
+│   └── profile/           # Profile page
+├── components/
+│   ├── ui/               # Reusable UI components
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Select.tsx
+│   │   ├── TextArea.tsx
+│   │   ├── Card.tsx
+│   │   ├── Tabs.tsx
+│   │   └── LoadingSpinner.tsx
+│   ├── dashboard/        # Dashboard components
+│   │   ├── Sidebar.tsx
+│   │   ├── ReportGenerator.tsx
+│   │   └── admin/
+│   ├── AuthModal.tsx
+│   ├── DemoBanner.tsx
+│   ├── Header.tsx
+│   └── Footer.tsx
+└── lib/
+    ├── supabase.ts       # Browser Supabase client
+    ├── supabase-server.ts # Server Supabase client
+    ├── auth-context.tsx  # Auth context provider
+    ├── demo-data.ts      # Demo mode sample data
+    ├── types.ts          # TypeScript interfaces
+    ├── claude.ts         # Claude API utilities
+    ├── impression-matcher.ts # Pattern matching logic
+    └── report-generator.ts   # Report generation orchestration
+```
 
 ## Code Style
 
-- Follow PEP 8 guidelines for Python code
-- Use meaningful variable and function names
-- Add docstrings to functions and classes
-- Keep functions focused and concise
+- Use TypeScript for all new code
+- Follow the existing code patterns
+- Use Tailwind CSS for styling
+- Keep components focused and reusable
+- Add proper TypeScript types
 
-## Pull Request Guidelines
+## Making Changes
 
-- Provide a clear description of the changes
-- Reference any related issues
-- Ensure all tests pass
-- Update documentation if needed
+1. Create a feature branch
 
-## Reporting Issues
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-When reporting issues, please include:
-- A clear description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Environment details (OS, Python version, etc.)
+2. Make your changes
+
+3. Run linting and tests
+
+   ```bash
+   npm run lint
+   npm run test
+   ```
+
+4. Commit your changes
+
+   ```bash
+   git commit -m "Add: description of your changes"
+   ```
+
+5. Push and create a pull request
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+## Database Changes
+
+If you need to modify the database schema:
+
+1. Update `supabase/schema.sql`
+2. Update the TypeScript types in `src/lib/types.ts`
+3. Update the demo data in `src/lib/demo-data.ts` if applicable
+4. Document the changes in your PR
+
+## API Routes
+
+All API routes are in `src/app/api/`. When adding new routes:
+
+- Follow the existing pattern for error handling
+- Support demo mode where appropriate
+- Add proper TypeScript types for request/response
+- Include authentication checks for protected routes
+
+## Testing
+
+Run tests with:
+
+```bash
+npm run test
+```
+
+When adding features, include appropriate tests.
 
 ## Questions?
 
-Feel free to open an issue for any questions about contributing.
+Feel free to open an issue or contact us at ari@quantnexus.ai.
